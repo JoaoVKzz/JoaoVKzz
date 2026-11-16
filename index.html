@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comandas</title>
+<style>
+:root{--bg:#eaf0ff;--card:#fff;--tx:#14213d;--mut:#5a6785;--bd:#c9d4f0;--ac:#3b4bdc;--act:#fff;--busy:#ff9f1c;--busytx:#2b1700;--free:#d4f5e2;--freebd:#2fb872;--freetx:#0b5132;--dan:#d6285a;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10152b;--card:#1a2142;--tx:#eef1ff;--mut:#9aa6cf;--bd:#2f3a6b;--ac:#7c8cff;--act:#0e1233;--busy:#ffb23e;--busytx:#2b1700;--free:#14382b;--freebd:#34d08a;--freetx:#a6f0cc;--dan:#ff6b8f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10152b;--card:#1a2142;--tx:#eef1ff;--mut:#9aa6cf;--bd:#2f3a6b;--ac:#7c8cff;--act:#0e1233;--busy:#ffb23e;--busytx:#2b1700;--free:#14382b;--freebd:#34d08a;--freetx:#a6f0cc;--dan:#ff6b8f;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+main{padding:16px 16px 96px;max-width:560px;margin:0 auto}
+h1{font-size:24px;margin:4px 0 14px;letter-spacing:-.01em;color:var(--ac)}
+h2{font-size:16px;margin:20px 0 8px}
+button{font:inherit;cursor:pointer;color:var(--tx)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mesa{border:2px solid var(--freebd);border-radius:14px;background:var(--free);color:var(--freetx);padding:10px 4px;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.mesa b{font-size:32px;line-height:1;font-variant-numeric:tabular-nums}
+.mesa span{font-size:13px;color:var(--freetx);font-weight:600}
+.mesa.busy{background:var(--busy);border:2px solid var(--busy);color:var(--busytx)}
+.mesa.busy span{color:var(--busytx);font-weight:700}
+.card{background:var(--card);border:1px solid var(--bd);border-left:6px solid var(--ac);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.row{display:flex;align-items:center;gap:10px}
+.grow{flex:1;min-width:0}
+.mut{color:var(--mut);font-size:14px}
+.btn{background:var(--ac);color:var(--act);border:0;border-radius:10px;padding:15px 18px;font-weight:700;width:100%}
+.btn.sec{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+.ib{width:40px;height:40px;border-radius:50%;border:2px solid var(--ac);background:var(--card);color:var(--ac);font-size:22px;line-height:1;flex:none}
+.ib.x{color:var(--dan);border-color:var(--dan)}
+.qtd{min-width:22px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.cat{border:2px solid var(--ac);border-radius:999px;background:var(--card);color:var(--ac);padding:11px 8px;font-weight:700}
+.cat.on{background:var(--ac);color:var(--act)}
+.chip{border:1px solid var(--bd);border-left:6px solid var(--c,var(--ac));background:var(--card);border-radius:10px;padding:12px;text-align:left;display:flex;flex-direction:column;min-height:60px}
+.chip small{color:var(--mut)}
+.chip:active{background:var(--busy);color:var(--busytx)}
+.chip:active small{color:var(--busytx)}
+.tot{color:var(--ac);font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
+input,select{font:inherit;width:100%;padding:13px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx)}
+.form{display:grid;gap:8px;margin-top:14px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+nav button{flex:1;border:0;background:none;color:var(--mut);padding:16px 4px;font-weight:700}
+nav button.on{color:var(--ac);box-shadow:inset 0 4px 0 var(--ac);background:var(--bg)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));z-index:20}
+.sheet{background:var(--card);border-radius:16px;padding:18px;width:100%;max-width:520px;display:grid;gap:10px}
+.sheet p{margin:0 0 4px;font-size:18px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--ac);color:var(--act);padding:12px 18px;border-radius:10px;font-weight:600;max-width:90%;text-align:center;z-index:30}
+.file-label{display:block;text-align:center;padding:15px 18px;border-radius:10px;border:1px solid var(--bd);background:transparent;color:var(--tx);font-weight:700;cursor:pointer}
+.file-label input{display:none}
+</style>
+</head>
+<body>
+<main id="v"></main>
+<div id="m"></div>
+<div id="t" class="toast" hidden></div>
+<nav>
+  <button data-a="tab" data-t="mesas">Mesas</button>
+  <button data-a="tab" data-t="cardapio">Cardápio</button>
+  <button data-a="tab" data-t="vendas">Vendas</button>
+</nav>
+<script>
+const NMESAS = 12, CHAVE = "comandas-v2";
+const PADRAO = {"Suco 300 ml":3,"Almoço":20,"Pão com queijo de manteiga":6,"Pão com queijo qualho":5,"Doce de leite":4,"Pudim":5,"Pipoca":3,"Cocada":2,"Vitamina de banana":6,"Vitamina de abacate":6,"Fatia de queijo qualho":5,"Fatia de queijo de manteiga":4,"Pelota":0.5,"Pão com carne":5,"Água normal":2,"Água com gás":4,"Refrigerante 250 ml":4,"Doce de goiaba":1.5,"Coca litro":9,"Coca Ks":5,"Café com leite":3,"Café sem leite":2,"Café da manhã":15,"Fatia de bolo":3,"Confeito":0.25,"Babalu":0.4};
+const CATS = ["Bebidas", "Sobremesas", "Almoço", "Café da manhã"];
+const CATPADRAO = {};
+[["Bebidas", ["Suco 300 ml", "Vitamina de banana", "Vitamina de abacate", "Água normal", "Água com gás", "Refrigerante 250 ml", "Coca litro", "Coca Ks"]],
+ ["Sobremesas", ["Doce de leite", "Pudim", "Cocada", "Doce de goiaba", "Fatia de bolo", "Confeito", "Babalu", "Pipoca", "Pelota"]],
+ ["Almoço", ["Almoço"]],
+ ["Café da manhã", ["Café da manhã", "Café com leite", "Café sem leite", "Pão com queijo de manteiga", "Pão com queijo qualho", "Fatia de queijo qualho", "Fatia de queijo de manteiga", "Pão com carne"]]
+].forEach(([c, l]) => l.forEach(n => CATPADRAO[n] = c));
+const catDe = n => (S.cat && S.cat[n]) || CATPADRAO[n] || "Bebidas";
+let S = {cardapio:{...PADRAO}, cat:{}, mesas:{}, vendas:[]};
+try { const r = localStorage.getItem(CHAVE); if (r) S = JSON.parse(r); } catch (e) {}
+if (!S.init) { for (let i = 1; i <= NMESAS; i++) S.mesas[i] = S.mesas[i] || []; S.init = true; }
+S.cat = S.cat || {};
+S.vendas = S.vendas || [];
+for (const n in S.cardapio) S.cat[n] = S.cat[n] || CATPADRAO[n] || "Bebidas";
+const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(S)); } catch (e) {} };
+const $ = id => document.getElementById(id);
+const moeda = v => "R$ " + v.toFixed(2).replace(".", ",");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const total = n => S.mesas[n].reduce((t, i) => t + i.preco * i.qtd, 0);
+const nums = () => Object.keys(S.mesas).map(Number).sort((a, b) => a - b);
+const COR = ["#3b4bdc","#e4572e","#17a398","#f2a900","#c2379d","#2f9e44","#e8590c","#1c7ed6"];
+let tab = "mesas", mesa = null, cb = null, tt, catAtual = "Bebidas";
+
+function aviso(msg) {
+  const t = $("t"); t.textContent = msg; t.hidden = false;
+  clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 2200);
+}
+function confirma(msg, ok, rot = "Fechar conta") {
+  cb = ok;
+  $("m").innerHTML = `<div class="modal"><div class="sheet"><p>${msg}</p><button class="btn" data-a="sim">${rot}</button><button class="btn sec" data-a="nao">Voltar</button></div></div>`;
+}
+
+function vMesas() {
+  let h = '<h1>Mesas</h1><div class="grid">';
+  for (const n of nums()) {
+    const o = S.mesas[n].length > 0;
+    h += `<button class="mesa${o ? " busy" : ""}" data-a="abrir" data-n="${n}"><b>${n}</b><span>${o ? moeda(total(n)) : "Livre"}</span></button>`;
+  }
+  return h + '</div><button class="btn sec" data-a="novamesa" style="margin-top:14px">Adicionar mesa</button>';
+}
+
+function vComanda() {
+  const it = S.mesas[mesa];
+  let h = `<div class="row" style="margin-bottom:10px"><button class="ib" data-a="voltar" aria-label="Voltar às mesas">‹</button><h1 style="margin:0">Mesa ${mesa}</h1></div>`;
+  h += it.length
+    ? it.map((x, i) => `<div class="card row"><div class="grow"><div>${esc(x.nome)}</div><div class="mut">${moeda(x.preco * x.qtd)}</div></div><button class="ib" data-a="menos" data-i="${i}" aria-label="Diminuir">−</button><span class="qtd">${x.qtd}</span><button class="ib" data-a="mais" data-i="${i}" aria-label="Aumentar">+</button></div>`).join("")
+    : '<p class="mut">Mesa sem pedidos. Toque em um item do cardápio para adicionar.</p>';
+  h += '<h2>Adicionar ao pedido</h2><div class="cats">' + CATS.map(c => `<button class="cat${c === catAtual ? " on" : ""}" data-a="cat" data-c="${c}">${c}</button>`).join("") + '</div><div class="chips">' +
+    Object.entries(S.cardapio).filter(([n]) => catDe(n) === catAtual).map(([n, p], k) => `<button class="chip" style="--c:${COR[k % COR.length]}" data-a="add" data-nome="${esc(n)}">${esc(n)}<small>${moeda(p)}</small></button>`).join("") + "</div>";
+  h += `<h2>Conta</h2><div class="card"><div class="row"><span class="grow mut">Total</span><span class="tot">${moeda(total(mesa))}</span></div></div><button class="btn" data-a="fechar">Fechar conta</button><button class="btn sec" data-a="rmesa" style="margin-top:24px;color:var(--dan)">Remover esta mesa</button>`;
+  return h;
+}
+
+function vCardapio() {
+  let h = "<h1>Cardápio</h1>";
+  h += Object.entries(S.cardapio).map(([n, p]) => `<div class="card row"><div class="grow">${esc(n)}<div class="mut">${esc(catDe(n))}: ${moeda(p)}</div></div><button class="ib x" data-a="apagar" data-nome="${esc(n)}" aria-label="Remover ${esc(n)}">×</button></div>`).join("");
+  h += '<div class="form"><h2 style="margin:12px 0 0">Novo item ou novo preço</h2><input id="nn" placeholder="Nome do item" autocomplete="off"><select id="nc" aria-label="Aba do item">' + CATS.map(c => '<option>' + c + '</option>').join("") + '</select><input id="np" placeholder="Preço (ex.: 12,50)" inputmode="decimal"><button class="btn" data-a="novo">Salvar item</button></div>';
+  return h;
+}
+
+function vVendas() {
+  const hoje = new Date().toLocaleDateString("pt-BR");
+  const lista = S.vendas.filter(v => v.dia === hoje).reverse();
+  const soma = lista.reduce((t, v) => t + v.total, 0);
+  let h = `<h1>Vendas de hoje</h1><div class="card"><div class="mut">Total do dia</div><div class="tot">${moeda(soma)}</div></div>`;
+  h += `<button class="btn" data-a="exportar" style="margin-bottom:8px">Exportar vendas (planilha CSV)</button>`;
+  h += `<button class="btn sec" data-a="backup" style="margin-bottom:8px">Fazer backup dos dados</button>`;
+  h += `<label class="file-label" style="margin-bottom:12px">Restaurar backup<input type="file" accept=".json,application/json" data-a="restaurar"></label>`;
+  h += lista.length
+    ? lista.map(v => `<div class="card"><div class="row"><b class="grow">Mesa ${v.mesa} às ${v.hora}</b><b>${moeda(v.total)}</b></div><div class="mut">${v.itens.map(i => i.qtd + "× " + esc(i.nome)).join(", ")}</div></div>`).join("")
+    : '<p class="mut">Nenhuma conta fechada hoje. As vendas aparecem aqui quando você fechar uma mesa.</p>';
+  return h;
+}
+
+function baixar(nome, conteudo, tipo) {
+  const blob = new Blob([conteudo], { type: tipo });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function exportar() {
+  if (!S.vendas.length) { aviso("Ainda não há vendas para exportar."); return; }
+  const cel = x => { x = String(x); return /[;"\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+  const num = v => v.toFixed(2).replace(".", ",");
+  const linhas = [["Data", "Hora", "Mesa", "Item", "Qtd", "Preço unitário", "Subtotal"]];
+  S.vendas.forEach(v => v.itens.forEach(i => linhas.push([v.dia, v.hora, v.mesa, i.nome, i.qtd, num(i.preco), num(i.preco * i.qtd)])));
+  const csv = "\ufeff" + linhas.map(l => l.map(cel).join(";")).join("\r\n");
+  baixar("vendas-comandas.csv", csv, "text/csv;charset=utf-8");
+  aviso("Planilha exportada.");
+}
+
+function backup() {
+  baixar("backup-comandas.json", JSON.stringify(S, null, 2), "application/json");
+  aviso("Backup gerado.");
+}
+
+function restaurar(file) {
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const dados = JSON.parse(r.result);
+      if (!dados || !dados.mesas || !dados.cardapio) throw new Error("inválido");
+      S = dados;
+      S.cat = S.cat || {};
+      S.vendas = S.vendas || [];
+      for (const n in S.cardapio) S.cat[n] = S.cat[n] || CATPADRAO[n] || "Bebidas";
+      salvar(); mesa = null; render(); aviso("Backup restaurado.");
+    } catch (e) { aviso("Arquivo de backup inválido."); }
+  };
+  r.readAsText(file);
+}
+
+function render() {
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.t === tab));
+  $("v").innerHTML = tab === "mesas" ? (mesa ? vComanda() : vMesas()) : tab === "cardapio" ? vCardapio() : vVendas();
+}
+
+document.addEventListener("change", e => {
+  const el = e.target.closest('[data-a="restaurar"]');
+  if (el && el.files && el.files[0]) restaurar(el.files[0]);
+});
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-a]"); if (!b) return;
+  const d = b.dataset, a = d.a, it = mesa ? S.mesas[mesa] : null;
+  if (a === "sim") { const f = cb; cb = null; $("m").innerHTML = ""; if (f) f(); return; }
+  if (a === "nao") { cb = null; $("m").innerHTML = ""; return; }
+  if (a === "tab") { tab = d.t; mesa = null; }
+  else if (a === "abrir") mesa = +d.n;
+  else if (a === "voltar") mesa = null;
+  else if (a === "exportar") { exportar(); return; }
+  else if (a === "backup") { backup(); return; }
+  else if (a === "cat") catAtual = d.c;
+  else if (a === "add") {
+    const x = it.find(i => i.nome === d.nome);
+    if (x) x.qtd++; else it.push({nome: d.nome, preco: S.cardapio[d.nome], qtd: 1});
+    salvar();
+  }
+  else if (a === "mais") { it[+d.i].qtd++; salvar(); }
+  else if (a === "menos") { if (--it[+d.i].qtd < 1) it.splice(+d.i, 1); salvar(); }
+  else if (a === "fechar") {
+    if (!it.length) { aviso("Adicione ao menos um item antes de fechar."); return; }
+    const n = mesa;
+    confirma(`Mesa ${n}: ${moeda(total(n))}`, () => {
+      const ag = new Date();
+      S.vendas.push({dia: ag.toLocaleDateString("pt-BR"), hora: ag.toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit"}), mesa: n, itens: S.mesas[n], total: total(n)});
+      S.mesas[n] = []; mesa = null; salvar(); aviso("Conta fechada. Mesa " + n + " liberada."); render();
+    });
+    return;
+  }
+  else if (a === "novamesa") { const n = Math.max(0, ...nums()) + 1; S.mesas[n] = []; salvar(); aviso("Mesa " + n + " adicionada."); }
+  else if (a === "rmesa") {
+    if (it.length) { aviso("Feche a conta antes de remover a mesa."); return; }
+    const n = mesa;
+    confirma(`Remover a Mesa ${n}?`, () => { delete S.mesas[n]; mesa = null; salvar(); aviso("Mesa " + n + " removida."); render(); }, "Remover mesa");
+    return;
+  }
+  else if (a === "apagar") { delete S.cardapio[d.nome]; delete S.cat[d.nome]; salvar(); }
+  else if (a === "novo") {
+    const nome = $("nn").value.trim(), preco = parseFloat($("np").value.replace(",", "."));
+    if (!nome || !(preco > 0)) { aviso("Informe um nome e um preço maior que zero."); return; }
+    S.cardapio[nome] = preco; S.cat[nome] = $("nc").value; salvar(); aviso("Item salvo.");
+  }
+  render();
+});
+render();
+</script>
+</body>
+</html>
