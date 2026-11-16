@@ -154,10 +154,10 @@ function baixar(nome, conteudo, tipo) {
 
 function exportar() {
   if (!S.vendas.length) { aviso("Ainda não há vendas para exportar."); return; }
-  const cel = x => { x = String(x); return /[,"\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+  // Função que coloca entre aspas se tiver ponto e vírgula, aspas ou quebra de linha
+  const cel = x => { x = String(x); return /[;"\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
   const num = v => v.toFixed(2).replace(".", ","); 
   
-  // Adicionada a coluna "Total Geral (Conta)"
   const linhas = [["Data", "Hora", "Mesa", "Item", "Qtd", "Preço unitário", "Subtotal", "Total Geral (Conta)"]];
   
   S.vendas.forEach(v => v.itens.forEach(i => {
@@ -169,11 +169,12 @@ function exportar() {
           i.qtd, 
           num(i.preco), 
           num(i.preco * i.qtd),
-          num(v.total) // Aqui puxa o total da mesa fechada
+          num(v.total) // Total da conta
       ]);
   }));
   
-  const csv = "\ufeff" + linhas.map(l => l.map(cel).join(",")).join("\r\n");
+  // Usando PONTO E VÍRGULA (;) para o Excel no Brasil não bugar os acentos
+  const csv = "\ufeff" + linhas.map(l => l.map(cel).join(";")).join("\r\n");
   
   baixar("vendas-comandas.csv", csv, "text/csv;charset=utf-8");
   aviso("Tabela exportada!");
