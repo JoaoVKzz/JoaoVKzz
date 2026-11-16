@@ -131,7 +131,7 @@ function vVendas() {
   const lista = S.vendas.filter(v => v.dia === hoje).reverse();
   const soma = lista.reduce((t, v) => t + v.total, 0);
   let h = `<h1>Vendas de hoje</h1><div class="card"><div class="mut">Total do dia</div><div class="tot">${moeda(soma)}</div></div>`;
-  h += `<button class="btn" data-a="exportar" style="margin-bottom:8px">Exportar vendas (planilha CSV)</button>`;
+  h += `<button class="btn" data-a="exportar" style="margin-bottom:8px">Exportar vendas (tabela)</button>`;
   h += `<button class="btn sec" data-a="backup" style="margin-bottom:8px">Fazer backup dos dados</button>`;
   h += `<label class="file-label" style="margin-bottom:12px">Restaurar backup<input type="file" accept=".json,application/json" data-a="restaurar"></label>`;
   h += lista.length
@@ -154,13 +154,16 @@ function baixar(nome, conteudo, tipo) {
 
 function exportar() {
   if (!S.vendas.length) { aviso("Ainda não há vendas para exportar."); return; }
-  const cel = x => { x = String(x); return /[;"\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
-  const num = v => v.toFixed(2).replace(".", ",");
+  const cel = x => { x = String(x); return /[,"\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+  const num = v => v.toFixed(2).replace(".", ","); // Mantém a vírgula para o Google Sheets formatar como dinheiro BRL automaticamente
   const linhas = [["Data", "Hora", "Mesa", "Item", "Qtd", "Preço unitário", "Subtotal"]];
   S.vendas.forEach(v => v.itens.forEach(i => linhas.push([v.dia, v.hora, v.mesa, i.nome, i.qtd, num(i.preco), num(i.preco * i.qtd)])));
-  const csv = "\ufeff" + linhas.map(l => l.map(cel).join(";")).join("\r\n");
+  
+  // Agora usa VÍRGULA como separador, que é o padrão que o Google Planilhas no celular entende na hora
+  const csv = "\ufeff" + linhas.map(l => l.map(cel).join(",")).join("\r\n");
+  
   baixar("vendas-comandas.csv", csv, "text/csv;charset=utf-8");
-  aviso("Planilha exportada.");
+  aviso("Tabela exportada!");
 }
 
 function backup() {
