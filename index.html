@@ -154,26 +154,29 @@ function baixar(nome, conteudo, tipo) {
 
 function exportar() {
   if (!S.vendas.length) { aviso("Ainda não há vendas para exportar."); return; }
-  // Função que coloca entre aspas se tiver ponto e vírgula, aspas ou quebra de linha
+  
   const cel = x => { x = String(x); return /[;"\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
   const num = v => v.toFixed(2).replace(".", ","); 
   
-  const linhas = [["Data", "Hora", "Mesa", "Item", "Qtd", "Preço unitário", "Subtotal", "Total Geral (Conta)"]];
-  
-  S.vendas.forEach(v => v.itens.forEach(i => {
+  // Cabeçalho mais limpo focado no fechamento
+  const linhas = [["Data", "Hora", "Mesa", "Total da Venda"]];
+  let somaTotalDia = 0;
+
+  // Adiciona uma linha para cada venda
+  S.vendas.forEach(v => {
       linhas.push([
           v.dia, 
           v.hora, 
           v.mesa, 
-          i.nome, 
-          i.qtd, 
-          num(i.preco), 
-          num(i.preco * i.qtd),
-          num(v.total) // Total da conta
+          num(v.total)
       ]);
-  }));
+      somaTotalDia += v.total;
+  });
   
-  // Usando PONTO E VÍRGULA (;) para o Excel no Brasil não bugar os acentos
+  // Adiciona a linha de total geral do dia
+  linhas.push(["TOTAL DO DIA", "", "", num(somaTotalDia)]);
+  
+  // Usando PONTO E VÍRGULA (;) para o Google Planilhas/Excel lerem perfeitamente
   const csv = "\ufeff" + linhas.map(l => l.map(cel).join(";")).join("\r\n");
   
   baixar("vendas-comandas.csv", csv, "text/csv;charset=utf-8");
