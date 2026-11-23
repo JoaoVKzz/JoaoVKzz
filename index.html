@@ -89,8 +89,8 @@ const nums = () => Object.keys(S.mesas).map(Number).sort((a, b) => a - b);
 const COR = ["#3b4bdc","#e4572e","#17a398","#f2a900","#c2379d","#2f9e44","#e8590c","#1c7ed6"];
 let tab = "mesas", mesa = null, cb = null, tt, catAtual = "Bebidas";
 
-// URL DO GOOGLE APPS SCRIPT
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDw-jLH2p1jiBs7EX9U3Qki-x0eUSOfYC73KRk4igAfYuu5mAxwNwC4tX1i_3wTwZx/exec";
+// NOVO LINK DO GOOGLE APPS SCRIPT ATUALIZADO AQUI
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLMLrVIBc_Zuf9AxkIQSmJ91jHErlLY30-KvNliEiauuBWfvKKbgnaoNvIJCRG-BFg/exec";
 
 function aviso(msg) {
   const t = $("t"); t.textContent = msg; t.hidden = false;
@@ -135,7 +135,6 @@ function vVendas() {
   const soma = lista.reduce((t, v) => t + v.total, 0);
   let h = `<h1>Vendas de hoje</h1><div class="card"><div class="mut">Total do dia</div><div class="tot">${moeda(soma)}</div></div>`;
   
-  // BOTÃO ATUALIZADO AQUI
   h += `<button class="btn" data-a="enviarPlanilha" style="margin-bottom:8px">Atualizar Planilha no Google</button>`;
   
   h += `<button class="btn sec" data-a="backup" style="margin-bottom:8px">Fazer backup dos dados</button>`;
@@ -158,7 +157,6 @@ function baixar(nome, conteudo, tipo) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// FUNÇÃO DE ENVIAR PARA O GOOGLE PLANILHAS
 async function enviarParaGoogle() {
   if (!S.vendas.length) { aviso("Ainda não há vendas para exportar."); return; }
   aviso("Enviando dados para o Google...");
