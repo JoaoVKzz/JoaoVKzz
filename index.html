@@ -89,7 +89,6 @@ const nums = () => Object.keys(S.mesas).map(Number).sort((a, b) => a - b);
 const COR = ["#3b4bdc","#e4572e","#17a398","#f2a900","#c2379d","#2f9e44","#e8590c","#1c7ed6"];
 let tab = "mesas", mesa = null, cb = null, tt, catAtual = "Bebidas";
 
-// NOVO LINK DO GOOGLE APPS SCRIPT ATUALIZADO AQUI
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLMLrVIBc_Zuf9AxkIQSmJ91jHErlLY30-KvNliEiauuBWfvKKbgnaoNvIJCRG-BFg/exec";
 
 function aviso(msg) {
@@ -173,14 +172,19 @@ async function enviarParaGoogle() {
     };
 
     try {
+      // Mudança no envio para evitar erro de CORS no Google
+      const formData = new URLSearchParams();
+      formData.append("payload", JSON.stringify(dados));
+
       await fetch(SCRIPT_URL, {
         method: 'POST',
-        body: JSON.stringify(dados),
-        headers: { 'Content-Type': 'application/json' }
+        body: formData,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       });
       sucesso++;
     } catch (e) {
       erros++;
+      console.log(e);
     }
   }
 
