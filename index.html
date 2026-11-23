@@ -89,7 +89,8 @@ const nums = () => Object.keys(S.mesas).map(Number).sort((a, b) => a - b);
 const COR = ["#3b4bdc","#e4572e","#17a398","#f2a900","#c2379d","#2f9e44","#e8590c","#1c7ed6"];
 let tab = "mesas", mesa = null, cb = null, tt, catAtual = "Bebidas";
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbu6dzFYEUB0JkzNyGQlcAvhR5kVVHQGoOxzFq_DbIyO0JSpAb9hkRZBYXq8smMFoD/exec";
+// COLE O SEU LINK DO /EXEC AQUI:
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLMLrVIBc_Zuf9AxkIQSmJ91jHErlLY30-KvNliEiauuBWfvKKbgnaoNvIJCRG-BFg/exec";
 
 function aviso(msg) {
   const t = $("t"); t.textContent = msg; t.hidden = false;
@@ -156,43 +157,78 @@ function baixar(nome, conteudo, tipo) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+// Função para pausar o código por alguns milissegundos
+const esperar = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 async function enviarParaGoogle() {
   if (!S.vendas.length) { aviso("Ainda não há vendas para exportar."); return; }
-  aviso("Enviando dados para o Google...");
+  
+  if (SCRIPT_URL === "COLE_AQUI_O_LINK_QUE_TERMINA_EM_EXEC") {
+      aviso("Você esqueceu de colocar o link do Google no código!");
+      return;
+  }
+
+  // Filtra apenas as vendas que ainda NÃO foram enviadas (para não duplicar)
+  const pendentes = S.vendas.filter(v => !v.enviada);
+  
+  if (pendentes.length === 0) {
+    aviso("A planilha já está 100% atualizada!");
+    return;
+  }
+
+  aviso("Enviando " + pendentes.length + " vendas pendentes...");
   
   let sucesso = 0;
   let erros = 0;
 
-  for (const venda of S.vendas) {
+  for (let i = 0; i < pendentes.length; i++) {
+    const venda = pendentes[i];
     const dados = {
       data: venda.dia,
       hora: venda.hora,
       mesa: venda.mesa,
-      total: venda.total.toFixed(2).replace(".", ",")
+      total: venda.total.toFixed(2).replace(".", ".")
     };
 
     try {
-      // Mudança no envio para evitar erro de CORS no Google
       const formData = new URLSearchParams();
       formData.append("payload", JSON.stringify(dados));
 
-      await fetch(SCRIPT_URL, {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos de limite
+
+      const response = await fetch(SCRIPT_URL, {
         method: 'POST',
         body: formData,
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        signal: controller.signal
       });
-      sucesso++;
+      
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        venda.enviada = true; 
+        sucesso++;
+        salvar(); 
+      } else {
+        erros++;
+      }
     } catch (e) {
       erros++;
-      console.log(e);
+    }
+    
+    // Pausa de meio segundo entre um envio e outro para não bloquear no Google
+    if (i < pendentes.length - 1) {
+      await esperar(500); 
     }
   }
 
   if (erros === 0) {
-    aviso(sucesso + " vendas enviadas!");
+    aviso(sucesso + " vendas enviadas com sucesso!");
   } else {
-    aviso(sucesso + " enviadas, mas " + erros + " falharam.");
+    aviso(sucesso + " enviadas, mas " + erros + " falharam. Tente de novo.");
   }
+  render(); 
 }
 
 function backup() {
@@ -250,7 +286,8 @@ document.addEventListener("click", e => {
     const n = mesa;
     confirma(`Mesa ${n}: ${moeda(total(n))}`, () => {
       const ag = new Date();
-      S.vendas.push({dia: ag.toLocaleDateString("pt-BR"), hora: ag.toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit"}), mesa: n, itens: S.mesas[n], total: total(n)});
+      // Toda nova venda nasce com "enviada = false"
+      S.vendas.push({dia: ag.toLocaleDateString("pt-BR"), hora: ag.toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit"}), mesa: n, itens: S.mesas[n], total: total(n), enviada: false});
       S.mesas[n] = []; mesa = null; salvar(); aviso("Conta fechada. Mesa " + n + " liberada."); render();
     });
     return;
